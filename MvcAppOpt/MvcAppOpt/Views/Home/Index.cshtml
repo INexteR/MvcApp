@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Кредитный калькулятор</title>
+    <link rel="stylesheet" type="text/css" href="~/lib/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/css/styles.css" asp-append-version="true">
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+</head>
+<body>
+    <div class="d-flex justify-content-center">
+        <!form method="post">
+        <h3>Расчёт аннуитетного займа</h3>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Сумма займа" name="amount" min="5000" max="10000000" maxlength="7" oninput="checkInt(this)" />
+            <p class="error">Введите значение от 5,000 до 10,000,000</p>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Срок займа (в днях)" name="term" min="5" max="1700" maxlength="4" oninput="checkTerm()" />
+            <p class="error"></p>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Ставка (в день)" name="bet" min="0.001" max="2" maxlength="5" step="0.001" oninput="checkFloat(this)" />
+            <p class="error">Введите значение от 0,001 до 2</p>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Шаг платежа (в днях)" name="step" min="1" max="30" maxlength="7" oninput="checkStep()" />
+            <p class="error"></p>
+        </div>
+        <div>
+            <input type="submit" class="btn btn-primary" id="btn" value="Рассчитать" />
+        </div>
+        </!form>
+    </div>
+    <script>
+        const msgs = document.getElementsByClassName("error");
+        const inputs = document.querySelectorAll("input[type='number']");
+        const errors = new Set();
+        const map = new Map();
+        for (var i = -1; ++i < inputs.length;) {
+            errors.add(inputs[i].name);
+            map[inputs[i].name] = msgs[i];
+            msgs[i].hidden = true;
+        }
+        const btn = document.getElementById("btn");
+        btn.disabled = true;
+        const term = document.getElementsByName("term")[0];
+        const step = document.getElementsByName("step")[0];
+        const termMsg = "Срок должен быть больше шага платежа";
+        const stepMsg = "Шаг должен быть меньше срока";
+
+        function maxLengthCheck(object) {
+            if (object.value.length > object.maxLength) {
+                object.value = object.value.slice(0, object.maxLength);
+                return true;
+            }
+            return false;
+        }
+
+        function validate(object, value) {
+            if (isNaN(value) || value < object.min || value > object.max) {
+                errors.add(object.name);
+                map[object.name].hidden = false;
+            }
+            else {
+                errors.delete(object.name);
+                map[object.name].hidden = true;
+            }
+            btn.disabled = errors.size > 0;
+        }
+
+        function checkInt(object) {
+            if (maxLengthCheck(object))
+                return;
+            validate(object, parseInt(object.value));
+        }
+
+        function checkFloat(object) {
+            if (maxLengthCheck(object))
+                return;
+            validate(object, parseFloat(object.value));
+        }
+
+        function checkTerm() {
+            if (maxLengthCheck(term))
+                return;
+            var termError = map["term"];
+            var termValue = parseInt(term.value);
+            var stepValue = parseInt(step.value);
+            if (isNaN(termValue) || termValue < term.min || termValue > term.max) {
+                errors.add("term");
+                termError.innerText = "Введите значение от 5 до 1700";
+                termError.hidden = false;
+            }
+            else if (!isNaN(stepValue) && termValue < stepValue) {
+                errors.add("term");
+                termError.innerText = termMsg;
+                termError.hidden = false;
+            }
+            else {
+                var stepError = map["step"];
+                if (stepError.innerText == stepMsg) {
+                    stepError.innerText = "";
+                    errors.delete("step");
+                    stepError.hidden = true;
+                }
+                termError.innerText = "";
+                errors.delete("term");
+                termError.hidden = true;
+            }
+            btn.disabled = errors.size > 0;
+        }    
+
+        function checkStep() {
+            if (maxLengthCheck(step))
+                return;
+            var stepError = map["step"];
+            var stepValue = parseInt(step.value);
+            var termValue = parseInt(term.value);
+            if (isNaN(stepValue) || stepValue < step.min || stepValue > step.max) {
+                errors.add("step");
+                stepError.innerText = "Введите значение от 1 до 30";
+                stepError.hidden = false;
+            }
+            else if (!isNaN(termValue) && stepValue > termValue) {
+                errors.add("step");
+                stepError.innerText = stepMsg;
+                stepError.hidden = false;
+            }
+            else {
+                var termError = map["term"];
+                if (termError.innerText == termMsg) {
+                    termError.innerText = "";
+                    errors.delete("term");
+                    termError.hidden = true;
+                }
+                stepError.innerText = "";
+                errors.delete("step");
+                stepError.hidden = true;
+            }
+            btn.disabled = errors.size > 0;
+        }
+    </script>
+</body>
+</html>

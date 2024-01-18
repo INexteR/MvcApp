@@ -1,0 +1,48 @@
+﻿@using MvcApp.Models;
+@model System.Collections.ObjectModel.ReadOnlyCollection<Result>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Результаты расчёта</title>
+    <link rel="stylesheet" type="text/css" href="~/lib/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/css/styles.css" asp-append-version="true">
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+</head>
+<body>
+    <div class="d-flex justify-content-center">
+        <div>
+            <h2 class="text-center">Результаты расчёта</h2>
+            <ul class="ps-2 listType">
+                <li>Сумма займа: @ViewBag.Loan.Amount.ToString("#,#") руб.</li>
+                <li>Срок займа: @ViewBag.Loan.Term мес.</li>
+                <li>Ставка: @ViewBag.Loan.Bet% годовых</li>
+            </ul>
+            <p>Ежемесячный платеж: @ViewBag.Annuity.ToString("#,#") руб.</p>
+            <table class="table table-bordered table-striped border-primary">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Дата платежа</th>
+                        <th>Основной долг</th>
+                        <th>Проценты</th>
+                        <th>Остаток долга</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = -1; ++i < Model.Count;)
+                    {
+                        var result = Model[i];
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td>@result.Date.ToLongDateString()</td>
+                            <td>@result.PrincipalDebt.ToString("#,#0.00")</td>
+                            <td>@result.Percentages.ToString("#,#0.00")</td>
+                            <td>@result.RemainingDebt.ToString("#,#0.00")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="text-end">Итоговая переплата: @ViewBag.Overpayment.ToString("#,#") руб.</p>
+        </div>
+    </div>
+</body>

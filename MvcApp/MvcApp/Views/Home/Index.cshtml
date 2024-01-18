@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Кредитный калькулятор</title>
+    <link rel="stylesheet" type="text/css" href="~/lib/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="~/lib/css/styles.css" asp-append-version="true">
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+</head>
+<body>
+    <div class="d-flex justify-content-center">
+        <!form method="post">
+        <h3>Расчёт аннуитетного займа</h3>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Сумма займа" name="amount" min="5000" max="10000000" maxlength="7" oninput="maxLengthCheck(this)" />
+            <p class="error">Введите значение от 5,000 до 10,000,000</p>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Срок займа (в мес.)" name="term" min="1" max="60" maxlength="2" oninput="maxLengthCheck(this)" />
+            <p class="error">Введите значение от 1 до 60</p>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Ставка (в год)" name="bet" min="10" max="60" maxlength="2" oninput="maxLengthCheck(this)" />
+            <p class="error">Введите значение от 10 до 60</p>
+        </div>
+        <div>
+            <input type="submit" class="btn btn-primary" id="btn" value="Рассчитать" />
+        </div>
+        </!form>
+    </div>
+    <script>
+        const msgs = document.getElementsByClassName("error");
+        const inputs = document.querySelectorAll("input[type='number']");
+        const errors = new Set();
+        const map = new Map();
+        const btn = document.getElementById("btn");
+        for (var i = -1; ++i < inputs.length;) {
+            errors.add(inputs[i].name);
+            map[inputs[i].name] = msgs[i];
+            msgs[i].hidden = true;
+        }
+        btn.disabled = true;
+
+        function maxLengthCheck(object) {
+            if (object.value.length > object.maxLength) {
+                object.value = object.value.slice(0, object.maxLength);
+                return;
+            }
+            var value = parseInt(object.value);
+            if (isNaN(value) || value < object.min || value > object.max) {
+                errors.add(object.name);
+                map[object.name].hidden = false;
+            }
+            else {
+                errors.delete(object.name);
+                map[object.name].hidden = true;
+            }
+            btn.disabled = errors.size > 0;
+        }
+    </script>
+</body>
+</html>
